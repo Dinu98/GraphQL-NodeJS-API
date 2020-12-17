@@ -2,5 +2,8 @@
   "development": {
     "dialect": "sqlite",
     "storage": "storage/db.sqlite"
+  },
+  "production": {
+    "dialect": "postgres"
   }
 }

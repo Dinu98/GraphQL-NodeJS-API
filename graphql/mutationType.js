@@ -3,7 +3,7 @@ const models = require('../models');
 const types = require('./types');
 
 const mutationType = new GraphQLObjectType({
-    name: 'Mutation',
+    name: 'RootMutation',
     fields: {
         createProduct:{
             type: types.productType,

@@ -14,7 +14,7 @@ module.exports = {
     */
    const mockProducts = new Array(10).fill().map(() => ({
     name: faker.commerce.productName(),
-    price: faker.commerce.price(),
+    price: parseInt(faker.commerce.price()),
     image: faker.image.imageUrl(),
     description: faker.commerce.productDescription(),
     createdAt: new Date(),

@@ -8,8 +8,7 @@ const models = require('../models');
 const reviewType = new GraphQLObjectType({
     name: "Review",
     description: "This represents a review",
-    fields: () => {
-        return ({
+    fields: () => ({
             id: { type: GraphQLNonNull(GraphQLInt)},
             userId: { type: GraphQLNonNull(GraphQLInt)},
             text: { type: GraphQLNonNull(GraphQLString)},
@@ -22,9 +21,8 @@ const reviewType = new GraphQLObjectType({
                    await parent.getUser();
                 }
             },
-        });
-    }
-})
+    })
+});
 
 const userType = new GraphQLObjectType({
     name: "User",
