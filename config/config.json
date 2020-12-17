@@ -4,6 +4,7 @@
     "storage": "storage/db.sqlite"
   },
   "production": {
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "use_env_variable": "DATABASE_URL"
   }
 }
