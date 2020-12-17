@@ -18,7 +18,7 @@ const reviewType = new GraphQLObjectType({
             user: {
                 type: userType,
                 resolve: async (parent) => {
-                   await parent.getUser();
+                   return await parent.getUser();
                 }
             },
     })
