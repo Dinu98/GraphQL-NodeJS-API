@@ -2,21 +2,11 @@ const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const app = express();
 const schema = require('./graphql/index');
+const database = require('./database');
 
-if(process.env.NODE_ENV === 'production') {
 
-    const { Client } = require('pg');
-
-    const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
-    });
-
-    client.connect();
-
-}
+if(process.env.NODE_ENV === 'production') 
+    database.connect();
 
 app.use("/graphql", graphqlHTTP({
     schema,
