@@ -1,0 +1,25 @@
+{
+  "name": "graphql-nodejs-api",
+  "version": "1.0.0",
+  "description": "API for an e-commerce website made with GraphQL and NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dinu98/GraphQL-NodeJS-API.git"
+  },
+  "author": "Dinescu Alexandru-Catalin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dinu98/GraphQL-NodeJS-API/issues"
+  },
+  "homepage": "https://github.com/Dinu98/GraphQL-NodeJS-API#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.4.0"
+  }
+}
