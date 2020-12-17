@@ -1,4 +1,4 @@
-const { GraphQLObjectType, GraphQLInt } = require('graphql');
+const { GraphQLObjectType, GraphQLInt, GraphQLList } = require('graphql');
 const types = require('./types')
 const models = require('../models');
 
@@ -35,6 +35,20 @@ const queryType = new GraphQLObjectType({
                 return await models.Product.findByPk(args.id);
             }
         },
+        users: {
+            type:  GraphQLList(types.userType),
+            description: "Returns all users",
+            resolve: async () => {
+                return await models.User.findAll();
+            }
+        },
+        reviews: {
+            type:  GraphQLList(types.reviewType),
+            description: "Returns all reviews",
+            resolve: async () => {
+                return await models.Review.findAll();
+            }
+        }
 
 	})
 });
