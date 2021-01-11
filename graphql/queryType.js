@@ -48,8 +48,22 @@ const queryType = new GraphQLObjectType({
             resolve: async () => {
                 return await models.Review.findAll();
             }
-        }
+        },
+        products: {
+            type:  GraphQLList(types.productType),
+            description: "Returns all products",
+            resolve: async () => {
+                return await models.Product.findAll();
+            }
+        },
+        me: {
+            type: types.userType,
+            description: "Returns current user",
+            resolve: (parent, args, context) => {
 
+              return context.user;
+            }
+          }
 	})
 });
 

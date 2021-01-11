@@ -4,6 +4,7 @@ const types = require('./types');
 const config = require('../config/appConfig');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const inputTypes = require('./inputTypes');
 
 
 const mutationType = new GraphQLObjectType({
@@ -13,20 +14,86 @@ const mutationType = new GraphQLObjectType({
             type: types.productType,
             description: "Creates a product",
             args:{
-                name: { type: GraphQLNonNull(GraphQLString)},
-                price: { type: GraphQLNonNull(GraphQLInt)},
-                image: { type: GraphQLNonNull(GraphQLString)},
-                description: { type: GraphQLNonNull(GraphQLString)},
+              productInput: {
+                type: GraphQLNonNull(inputTypes.productInputType)
+              },
             },
-            resolve: async (parent, productData) => {
+            resolve: async (parent, {productInput}) => {
+                console.log(productInput);
+                const post = await models.Product.create(productInput)
 
-                const post = await models.Product.create(productData)
+                console.log(post);
 
                 return post;
             }
         },
+        editProduct:{
+          type: types.productType,
+          description: "Edit a product",
+          args:{
+              id: { type: GraphQLNonNull(GraphQLInt)},
+              productInput: {
+                type: GraphQLNonNull(inputTypes.productInputType)
+              },
+          },
+          resolve: async (parent, { id, productInput}) => {
+              const post = await models.Product.findByPk(id);
+
+              if(!post){
+                return null;
+              };
+
+              await post.update(productInput)
+
+              return post;
+          }
+        },
+        createReview:{
+          type: types.reviewType,
+          description: "Creates a review",
+          args:{
+            reviewInput: {
+              type: GraphQLNonNull(inputTypes.reviewInputType)
+            },
+          },
+          resolve: async (parent, {reviewInput}, context) => {
+              const { user } = context;
+
+              if(!user){
+                return null;
+              }
+              
+              reviewInput.userId = user.id;
+              const review = await models.Review.create(reviewInput)
+
+              return review;
+          }
+        },
+        editReview:{
+          type: types.reviewType,
+          description: "Edit a review",
+          args:{
+            id: { type: GraphQLNonNull(GraphQLInt)},
+            reviewInput: {
+              type: GraphQLNonNull(inputTypes.reviewInputType)
+            },
+          },
+          resolve: async (parent, { id, reviewInput }, context) => {
+              const { user } = context;
+              const review = await models.Review.findByPk(id);
+
+              if(!user || user.id !== review.userId || !review){
+                return null;
+              }
+
+              await review.update(reviewInput);
+
+              return review;
+          }
+        },
         login: {
             type: GraphQLString,
+            description: "User login",
             args: {
               email: {
                 type: GraphQLNonNull(GraphQLString),
@@ -54,7 +121,40 @@ const mutationType = new GraphQLObjectType({
       
               return null;
             }
-        }
+        },
+        register:{
+          type: GraphQLString,
+          description: "User registration",
+          args:{
+            email: {
+              type: GraphQLNonNull(GraphQLString),
+            },
+            password: {
+              type: GraphQLNonNull(GraphQLString),
+            },
+          },
+          resolve: async (parent, userData) => {
+
+            const potentialUserInDb = await models.User.findOne({
+              where:{
+                email: userData.email
+              }
+            });
+
+            if(!potentialUserInDb){
+
+              const hashedPassword = await bcrypt.hash(userData.password, config.SALT_ROUNDS);
+              userData.password = hashedPassword;
+              const user = await models.User.create(userData);
+  
+              const token = jwt.sign({userId: user.id}, config.JWTSECRET);
+  
+              return token;
+            }
+
+            return null;
+          }
+        },
     }
   });
 
