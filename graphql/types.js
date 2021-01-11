@@ -38,6 +38,12 @@ const userType = new GraphQLObjectType({
                 return await parent.getReviews();
             }
         },
+        productsInBasket: {
+            type: GraphQLList(productType),
+            resolve: async (parent) =>{
+                return await parent.getProducts();
+            }
+        },
         createdAt: { type: GraphQLNonNull(GraphQLString)},
         updatedAt: { type: GraphQLNonNull(GraphQLString)}
     })
@@ -52,6 +58,12 @@ const productType = new GraphQLObjectType({
         image: { type: GraphQLNonNull(GraphQLString)},
         price: { type: GraphQLNonNull(GraphQLString)},
         description: { type: GraphQLNonNull(GraphQLString)},
+        users:{
+            type: GraphQLList(userType),
+            resolve: async (parent) => {
+                return await parent.getUsers();
+            }
+        },
         createdAt: { type: GraphQLNonNull(GraphQLString)},
         updatedAt: { type: GraphQLNonNull(GraphQLString)}
     })

@@ -48,6 +48,26 @@ const mutationType = new GraphQLObjectType({
               return post;
           }
         },
+        addProductToBasket:{
+          type: types.productType,
+          description: "Add a product to the current user basket",
+          args:{
+            id: {type: GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async (parent, {id}, context) => {
+            const product = await models.Product.findByPk(id);
+            const {user} = context;
+
+            if(!product || !user ){
+              return null
+            }
+
+            await user.addProduct(product);
+            await product.addUser(user);
+
+            return product;
+          }
+        },
         createReview:{
           type: types.reviewType,
           description: "Creates a review",
