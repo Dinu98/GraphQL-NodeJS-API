@@ -14,8 +14,6 @@ module.exports = {
      * }], {});
     */
    const mockProducts = new Array(10).fill().map(() => ({
-    userId: faker.random.number() % 10,
-    orderId: faker.random.number() % 10,
     name: faker.commerce.productName(),
     price: parseInt(faker.commerce.price()),
     image: faker.image.imageUrl(),

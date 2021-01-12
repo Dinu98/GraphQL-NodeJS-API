@@ -10,11 +10,11 @@ module.exports = {
 
    const mockUsers = new Array(10).fill().map(() => ({
     username:faker.internet.userName(),
-     email: faker.internet.email(),
-     password: hashedPassword,
-     profilePicture: faker.image.imageUrl(),
-     createdAt: new Date(),
-     updatedAt: new Date(),
+    email: faker.internet.email(),
+    password: hashedPassword,
+    profilePicture: faker.image.imageUrl(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
    }));
 
    await queryInterface.bulkInsert('Users', mockUsers, {});  

@@ -1,10 +1,11 @@
-const { GraphQLObjectType, GraphQLNonNull, GraphQLInt, GraphQLString } = require('graphql');
+const { GraphQLObjectType, GraphQLNonNull, GraphQLInt, GraphQLString, GraphQLBoolean } = require('graphql');
 const models = require('../models');
 const types = require('./types');
 const config = require('../config/appConfig');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const inputTypes = require('./inputTypes');
+const { userType } = require('./types');
 
 
 const mutationType = new GraphQLObjectType({
@@ -19,10 +20,7 @@ const mutationType = new GraphQLObjectType({
               },
             },
             resolve: async (parent, {productInput}) => {
-                console.log(productInput);
                 const post = await models.Product.create(productInput)
-
-                console.log(post);
 
                 return post;
             }
@@ -36,16 +34,17 @@ const mutationType = new GraphQLObjectType({
                 type: GraphQLNonNull(inputTypes.productInputType)
               },
           },
-          resolve: async (parent, { id, productInput}) => {
-              const post = await models.Product.findByPk(id);
+          resolve: async (parent, { id, productInput }, context) => 
+          {
+              const product = await models.Product.findByPk(id);
 
-              if(!post){
+              if(!product){
                 return null;
-              };
+              }
 
-              await post.update(productInput)
+              await product.update(productInput)
 
-              return post;
+              return product;
           }
         },
         addProductToBasket:{
@@ -63,9 +62,27 @@ const mutationType = new GraphQLObjectType({
             }
 
             await user.addProduct(product);
-            await product.addUser(user);
 
             return product;
+          }
+        },
+        removeProductFromBasket:{
+          type: GraphQLBoolean,
+          description: "Remove a product from the current user basket",
+          args:{
+            id: {type: GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async (parent, {id}, context) => {
+            const product = await models.Product.findByPk(id);
+            const {user} = context;
+
+            if(!product || !user){
+              return null;
+            }
+
+            await user.removeProduct(product);
+
+            return true;
           }
         },
         placeOrder:{
@@ -73,23 +90,23 @@ const mutationType = new GraphQLObjectType({
           description: "Places an order with the products in the basket",
           resolve: async (parent, data, context) => {
             const { user } = context;
-            const {id} = user;
 
             if(!user){
               return null;
             }
 
-            const numOfProducts = await models.Product.findAndCountAll({
-              where:{
-                userId: id
-              }
-            });
+            const { id } = user;
 
-            const {count} = numOfProducts;
+            const products = await user.getProducts();
+            const count = products.length;
 
             const orderData = {userId: id, numOfProducts: count};
-
             const order = await models.Order.create(orderData);
+
+            for(let product of products){
+              await product.addOrder(order);
+              await user.removeProduct(product);
+            }
 
             return order;
           }
@@ -135,6 +152,28 @@ const mutationType = new GraphQLObjectType({
               await review.update(reviewInput);
 
               return review;
+          }
+        },
+        deleteReview:{
+          type: GraphQLBoolean,
+          description: "Delete a review",
+          args:{
+            id: { type: GraphQLNonNull(GraphQLInt)},
+          },
+          resolve: async (parent, { id }, context) => {
+            const { user } = context;
+            const review = await models.Review.findByPk(id);
+
+            console.log(user);
+            console.log(review);
+
+            if(!user || !review || user.id !== review.userId){
+              return null;
+            }
+
+            await review.destroy();
+
+            return true;
           }
         },
         login: {
