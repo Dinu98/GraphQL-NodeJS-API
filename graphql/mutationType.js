@@ -68,6 +68,32 @@ const mutationType = new GraphQLObjectType({
             return product;
           }
         },
+        placeOrder:{
+          type: types.orderType,
+          description: "Places an order with the products in the basket",
+          resolve: async (parent, data, context) => {
+            const { user } = context;
+            const {id} = user;
+
+            if(!user){
+              return null;
+            }
+
+            const numOfProducts = await models.Product.findAndCountAll({
+              where:{
+                userId: id
+              }
+            });
+
+            const {count} = numOfProducts;
+
+            const orderData = {userId: id, numOfProducts: count};
+
+            const order = await models.Order.create(orderData);
+
+            return order;
+          }
+        },
         createReview:{
           type: types.reviewType,
           description: "Creates a review",

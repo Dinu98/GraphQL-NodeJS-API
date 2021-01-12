@@ -38,6 +38,12 @@ const userType = new GraphQLObjectType({
                 return await parent.getReviews();
             }
         },
+        orders:{
+            type: GraphQLList(orderType),
+            resolve: async (parent) => {
+                return await parent.getOrders();
+            }
+        },
         productsInBasket: {
             type: GraphQLList(productType),
             resolve: async (parent) =>{
@@ -64,8 +70,30 @@ const productType = new GraphQLObjectType({
                 return await parent.getUsers();
             }
         },
+        orders:{
+            type: GraphQLList(orderType),
+            resolve: async (parent) => {
+                return await parent.getOrders();
+            }
+        },
         createdAt: { type: GraphQLNonNull(GraphQLString)},
         updatedAt: { type: GraphQLNonNull(GraphQLString)}
+    })
+});
+
+const orderType = new GraphQLObjectType({
+    name: "Order",
+    description: "This represents an order",
+    fields: () => ({
+        id: { type: GraphQLNonNull(GraphQLInt)},
+        userId: { type: GraphQLNonNull(GraphQLInt)},
+        numOfProducts: { type: GraphQLNonNull(GraphQLInt)},
+        products: {
+            type: GraphQLList(productType),
+            resolve: async (parent) =>{
+                return await parent.getProducts();
+            }
+        }
     })
 });
 
@@ -75,7 +103,8 @@ const productType = new GraphQLObjectType({
 const types = {
     userType,
     reviewType,
-    productType
+    productType,
+    orderType
 }
 
 module.exports = types; 

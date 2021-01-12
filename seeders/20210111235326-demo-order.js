@@ -1,5 +1,4 @@
 'use strict';
-const { fake } = require('faker');
 const faker = require('faker');
 
 module.exports = {
@@ -13,18 +12,14 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-   const mockProducts = new Array(10).fill().map(() => ({
+   const mockOrders = new Array(10).fill().map(() => ({
     userId: faker.random.number() % 10,
-    orderId: faker.random.number() % 10,
-    name: faker.commerce.productName(),
-    price: parseInt(faker.commerce.price()),
-    image: faker.image.imageUrl(),
-    description: faker.commerce.productDescription(),
+    numOfProducts: faker.random.number() % 10,
     createdAt: new Date(),
     updatedAt: new Date(),
   }));
 
-   await queryInterface.bulkInsert('Products', mockProducts, {});  
+  await queryInterface.bulkInsert('Orders', mockOrders, {});  
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -34,6 +29,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.bulkDelete('Products', null, {});
+    await queryInterface.bulkDelete('Orders', null, {});
   }
 };
