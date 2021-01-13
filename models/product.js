@@ -12,10 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       models.Product.belongsToMany(models.User, { through: 'UsersProducts' });
       models.Product.belongsToMany(models.Order, {through: 'OrdersProducts' });
+      models.Product.belongsTo(models.Company, {foreignKey: 'companyId'});
     }
   };
   Product.init({
     name: DataTypes.STRING,
+    companyId: DataTypes.STRING,
     price: DataTypes.NUMBER,
     image: DataTypes.STRING,
     description: DataTypes.STRING

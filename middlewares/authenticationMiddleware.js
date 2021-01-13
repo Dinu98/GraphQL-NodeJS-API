@@ -9,9 +9,15 @@ const authenticationMiddleware = (req, res, next) => {
     if(err) {
       next();
     } else {
-      const user = await models.User.findByPk(parseInt(data.userId));
 
-      req.user = user;
+      if(data.loginType){
+        const user = await models.User.findByPk(parseInt(data.entityId));
+        req.user = user;
+      } else {
+        const company = await models.Company.findByPk(parseInt(data.entityId));
+        req.company = company;
+      }
+      
       next();
     }
   });

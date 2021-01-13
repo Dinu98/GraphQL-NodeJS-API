@@ -3,7 +3,6 @@ const { GraphQLObjectType,
     GraphQLString, 
     GraphQLNonNull, 
     GraphQLList } = require('graphql');
-const models = require('../models');
 
 const reviewType = new GraphQLObjectType({
     name: "Review",
@@ -76,6 +75,12 @@ const productType = new GraphQLObjectType({
                 return await parent.getOrders();
             }
         },
+        company:{
+            type: companyType,
+            resolve: async (parent) => {
+                return await parent.getCompany();
+            }
+        },
         createdAt: { type: GraphQLNonNull(GraphQLString)},
         updatedAt: { type: GraphQLNonNull(GraphQLString)}
     })
@@ -93,18 +98,45 @@ const orderType = new GraphQLObjectType({
             resolve: async (parent) =>{
                 return await parent.getProducts();
             }
-        }
+        },
+        company:{
+            type: companyType,
+            resolve: async (parent) => {
+                return await parent.getCompany();
+            }
+        },
     })
 });
 
-
-
+const companyType = new GraphQLObjectType({
+    name: "Company",
+    description: "This represents a company",
+    fields: () => ({
+        id: { type: GraphQLNonNull(GraphQLInt)},
+        email: { type: GraphQLNonNull(GraphQLString)},
+        telephoneNumber: { type: GraphQLNonNull(GraphQLString)},
+        address: { type: GraphQLNonNull(GraphQLString)},
+        products: {
+            type: GraphQLList(productType),
+            resolve: async (parent) =>{
+                return await parent.getProducts();
+            }
+        },
+        orders:{
+            type: GraphQLList(orderType),
+            resolve: async (parent) => {
+                return await parent.getOrders();
+            }
+        },
+    })
+})
 
 const types = {
     userType,
     reviewType,
     productType,
-    orderType
+    orderType,
+    companyType
 }
 
 module.exports = types; 

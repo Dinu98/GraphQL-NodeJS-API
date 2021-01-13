@@ -56,14 +56,24 @@ const queryType = new GraphQLObjectType({
                 return await models.Product.findAll();
             }
         },
-        me: {
+        currentUser: {
             type: types.userType,
             description: "Returns current user",
             resolve: (parent, args, context) => {
-
-              return context.user;
+                const { user } = context;
+            
+                return user;
             }
-          }
+        },
+        currentCompany: {
+            type: types.companyType,
+            description: "Return current company",
+            resolve: (parent, args, context) => {
+                const { company } = context;
+
+                return company;
+            }
+        }
 	})
 });
 

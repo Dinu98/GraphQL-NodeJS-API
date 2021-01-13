@@ -5,7 +5,6 @@ const config = require('../config/appConfig');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const inputTypes = require('./inputTypes');
-const { userType } = require('./types');
 
 
 const mutationType = new GraphQLObjectType({
@@ -19,10 +18,17 @@ const mutationType = new GraphQLObjectType({
                 type: GraphQLNonNull(inputTypes.productInputType)
               },
             },
-            resolve: async (parent, {productInput}) => {
-                const post = await models.Product.create(productInput)
+            resolve: async (parent, {productInput}, context) => {
+              const { company } = context;
 
-                return post;
+              if(!company){
+                return null;
+              }
+              
+              productInput.companyId = company.id;
+              const post = await models.Product.create(productInput)
+
+              return post;
             }
         },
         editProduct:{
@@ -34,17 +40,36 @@ const mutationType = new GraphQLObjectType({
                 type: GraphQLNonNull(inputTypes.productInputType)
               },
           },
-          resolve: async (parent, { id, productInput }, context) => 
-          {
+          resolve: async (parent, { id, productInput }, context) => {
               const product = await models.Product.findByPk(id);
+              const { company } = context;
 
-              if(!product){
+              if(!product || !company || product.companyId !== company.id){
                 return null;
               }
 
               await product.update(productInput)
 
               return product;
+          }
+        },
+        deleteProduct:{
+          type: GraphQLBoolean,
+          description: "Delete a product",
+          args:{
+            id: {type: GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async (parent, { id }, context) =>{
+            const product = await models.Product.findByPk(id);
+            const { company } = context;
+
+            if(!product || !company || product.companyId !== company.id){
+              return null;
+            }
+
+            await product.destroy();
+
+            return true;
           }
         },
         addProductToBasket:{
@@ -90,6 +115,8 @@ const mutationType = new GraphQLObjectType({
           description: "Places an order with the products in the basket",
           resolve: async (parent, data, context) => {
             const { user } = context;
+
+            console.log(user);
 
             if(!user){
               return null;
@@ -186,19 +213,31 @@ const mutationType = new GraphQLObjectType({
               password: {
                 type: GraphQLNonNull(GraphQLString),
               },
+              loginType:{
+                type: GraphQLNonNull(GraphQLBoolean),
+                description: "True if it is an user, false if it is a company"
+              }
             },
-            resolve: async (parent, { email, password }) => {
-              const user = await models.User.findOne({
+            resolve: async (parent, { email, password, loginType }) => {
+              let model;
+
+              if(loginType){
+                model = models.User;
+              } else{
+                model = models.Company
+              }
+
+              const entity = await model.findOne({
                 where: {
                   email,
                 }
               });
 
-              if(user) {
-                const isValid = await bcrypt.compare(password, user.password);
+              if(entity) {
+                const isValid = await bcrypt.compare(password, entity.password);
 
                 if(isValid) {
-                  const token = jwt.sign({userId: user.id}, config.JWTSECRET);
+                  const token = jwt.sign({entityId: entity.id, loginType}, config.JWTSECRET);
 
                   return token;
                 }
