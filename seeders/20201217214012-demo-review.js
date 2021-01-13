@@ -14,6 +14,7 @@ module.exports = {
     */
    const mockReviews = new Array(10).fill().map(() => ({
     userId: faker.random.number() % 10,
+    productId: faker.random.number() % 10,
     text: faker.lorem.sentence(),
     rating: faker.random.number() % 6,
     createdAt: new Date(),

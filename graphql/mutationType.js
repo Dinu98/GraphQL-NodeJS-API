@@ -145,8 +145,11 @@ const mutationType = new GraphQLObjectType({
             reviewInput: {
               type: GraphQLNonNull(inputTypes.reviewInputType)
             },
+            productId:{
+              type: GraphQLNonNull(GraphQLInt)
+            }
           },
-          resolve: async (parent, {reviewInput}, context) => {
+          resolve: async (parent, {reviewInput, productId}, context) => {
               const { user } = context;
 
               if(!user){
@@ -154,6 +157,7 @@ const mutationType = new GraphQLObjectType({
               }
               
               reviewInput.userId = user.id;
+              reviewInput.productId = productId;
               const review = await models.Review.create(reviewInput)
 
               return review;
@@ -190,9 +194,6 @@ const mutationType = new GraphQLObjectType({
           resolve: async (parent, { id }, context) => {
             const { user } = context;
             const review = await models.Review.findByPk(id);
-
-            console.log(user);
-            console.log(review);
 
             if(!user || !review || user.id !== review.userId){
               return null;
