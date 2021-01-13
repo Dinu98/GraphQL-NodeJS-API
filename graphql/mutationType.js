@@ -26,9 +26,9 @@ const mutationType = new GraphQLObjectType({
               }
               
               productInput.companyId = company.id;
-              const post = await models.Product.create(productInput)
+              const product = await models.Product.create(productInput)
 
-              return post;
+              return product;
             }
         },
         editProduct:{
@@ -120,8 +120,6 @@ const mutationType = new GraphQLObjectType({
           resolve: async (parent, data, context) => {
             const { user } = context;
 
-            console.log(user);
-
             if(!user){
               return null;
             }
@@ -131,7 +129,7 @@ const mutationType = new GraphQLObjectType({
             const products = await user.getProducts();
             const count = products.length;
 
-            const orderData = {userId: id, numOfProducts: count};
+            const orderData = {userId: id, numOfProducts: count, companyId: 1};
             const order = await models.Order.create(orderData);
 
             for(let product of products){
@@ -265,6 +263,7 @@ const mutationType = new GraphQLObjectType({
 
                   return token;
                 }
+                return null;
               }
       
               return null;
@@ -295,7 +294,7 @@ const mutationType = new GraphQLObjectType({
               userData.password = hashedPassword;
               const user = await models.User.create(userData);
   
-              const token = jwt.sign({userId: user.id}, config.JWTSECRET);
+              const token = jwt.sign({entityId: user.id, loginType: true}, config.JWTSECRET);
   
               return token;
             }
