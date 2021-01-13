@@ -13,9 +13,9 @@ module.exports = {
      * }], {});
     */
    const mockOrders = new Array(10).fill().map(() => ({
-    userId: faker.random.number() % 10,
-    companyId: faker.random.number() % 10,
-    numOfProducts: faker.random.number() % 10,
+    userId: (faker.random.number() % 10) + 1,
+    companyId: (faker.random.number() % 10) + 1,
+    numOfProducts: (faker.random.number() % 10) + 1,
     createdAt: new Date(),
     updatedAt: new Date(),
   }));

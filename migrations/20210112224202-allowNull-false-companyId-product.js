@@ -5,6 +5,7 @@ module.exports = {
     await queryInterface.changeColumn(
       'Products',
       'companyId',{
+        type: Sequelize.INTEGER,
         allowNull: false
       }
     )
@@ -14,6 +15,7 @@ module.exports = {
     await queryInterface.changeColumn(
       'Products',
       'companyId',{
+        type: Sequelize.INTEGER,
         allowNull: true
       }
     )

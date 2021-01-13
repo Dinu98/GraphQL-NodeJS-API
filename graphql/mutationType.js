@@ -26,9 +26,9 @@ const mutationType = new GraphQLObjectType({
               }
               
               productInput.companyId = company.id;
-              const post = await models.Product.create(productInput)
+              const product = await models.Product.create(productInput)
 
-              return post;
+              return product;
             }
         },
         editProduct:{
@@ -102,10 +102,14 @@ const mutationType = new GraphQLObjectType({
             const {user} = context;
 
             if(!product || !user){
-              return null;
+              return false;
             }
 
-            await user.removeProduct(product);
+            const deleteStatus = await user.removeProduct(product);
+            
+            if(!deleteStatus){
+              return false;
+            }
 
             return true;
           }
@@ -116,8 +120,6 @@ const mutationType = new GraphQLObjectType({
           resolve: async (parent, data, context) => {
             const { user } = context;
 
-            console.log(user);
-
             if(!user){
               return null;
             }
@@ -127,7 +129,7 @@ const mutationType = new GraphQLObjectType({
             const products = await user.getProducts();
             const count = products.length;
 
-            const orderData = {userId: id, numOfProducts: count};
+            const orderData = {userId: id, numOfProducts: count, companyId: 1};
             const order = await models.Order.create(orderData);
 
             for(let product of products){
@@ -138,6 +140,25 @@ const mutationType = new GraphQLObjectType({
             return order;
           }
         },
+        cancelOrder:{
+          type: GraphQLBoolean,
+          description: "Cancels a specific order of the current user",
+          args:{
+            orderId: {type: GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async (parent, {orderId}, context) => {
+            const {user} = context;
+            const order = await models.Order.findByPk(orderId);
+
+            if(!user || !order || user.id !== order.userId){
+              return false;
+            }
+
+            await order.destroy();
+
+            return true;
+          }
+        },
         createReview:{
           type: types.reviewType,
           description: "Creates a review",
@@ -145,8 +166,11 @@ const mutationType = new GraphQLObjectType({
             reviewInput: {
               type: GraphQLNonNull(inputTypes.reviewInputType)
             },
+            productId:{
+              type: GraphQLNonNull(GraphQLInt)
+            }
           },
-          resolve: async (parent, {reviewInput}, context) => {
+          resolve: async (parent, {reviewInput, productId}, context) => {
               const { user } = context;
 
               if(!user){
@@ -154,6 +178,7 @@ const mutationType = new GraphQLObjectType({
               }
               
               reviewInput.userId = user.id;
+              reviewInput.productId = productId;
               const review = await models.Review.create(reviewInput)
 
               return review;
@@ -191,11 +216,8 @@ const mutationType = new GraphQLObjectType({
             const { user } = context;
             const review = await models.Review.findByPk(id);
 
-            console.log(user);
-            console.log(review);
-
             if(!user || !review || user.id !== review.userId){
-              return null;
+              return false;
             }
 
             await review.destroy();
@@ -241,6 +263,7 @@ const mutationType = new GraphQLObjectType({
 
                   return token;
                 }
+                return null;
               }
       
               return null;
@@ -271,7 +294,7 @@ const mutationType = new GraphQLObjectType({
               userData.password = hashedPassword;
               const user = await models.User.create(userData);
   
-              const token = jwt.sign({userId: user.id}, config.JWTSECRET);
+              const token = jwt.sign({entityId: user.id, loginType: true}, config.JWTSECRET);
   
               return token;
             }

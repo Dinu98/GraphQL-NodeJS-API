@@ -10,6 +10,7 @@ const reviewType = new GraphQLObjectType({
     fields: () => ({
             id: { type: GraphQLNonNull(GraphQLInt)},
             userId: { type: GraphQLNonNull(GraphQLInt)},
+            productId: { type: GraphQLNonNull(GraphQLInt)},
             text: { type: GraphQLNonNull(GraphQLString)},
             rating: { type: GraphQLNonNull(GraphQLInt)},
             createdAt: { type: GraphQLNonNull(GraphQLString)},
@@ -18,6 +19,12 @@ const reviewType = new GraphQLObjectType({
                 type: userType,
                 resolve: async (parent) => {
                    return await parent.getUser();
+                }
+            },
+            product: {
+                type: productType,
+                resolve: async (parent) => {
+                   return await parent.getProduct();
                 }
             },
     })

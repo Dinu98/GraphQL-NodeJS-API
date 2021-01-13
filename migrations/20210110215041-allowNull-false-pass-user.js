@@ -5,6 +5,7 @@ module.exports = {
     await queryInterface.changeColumn(
       'Users',
       'password',{
+        type: Sequelize.STRING,
         allowNull: false
       }
     )
@@ -14,6 +15,7 @@ module.exports = {
     await queryInterface.changeColumn(
       'Users',
       'password',{
+        type: Sequelize.STRING,
         allowNull: true
       }
     )

@@ -3,21 +3,21 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.changeColumn(
-      'Orders',
-      'companyId',{
-        type: Sequelize.INTEGER,
+      'Users',
+      'isAdmin',{
+        type: Sequelize.BOOLEAN,
         allowNull: false
       }
-    )
+    );
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.changeColumn(
-      'Orders',
-      'companyId',{
-        type: Sequelize.INTEGER,
-        allowNull: true
+      'Users',
+      'isAdmin',{
+        type: Sequelize.BOOLEAN,
+        allowNull: false
       }
-    )
+    );
   }
 };

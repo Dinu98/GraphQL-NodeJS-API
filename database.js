@@ -10,7 +10,7 @@ class Database {
         });
     
         client.connect();
-    }
+    }         
 }
 
 module.exports = new Database();

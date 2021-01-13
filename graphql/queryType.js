@@ -56,6 +56,21 @@ const queryType = new GraphQLObjectType({
                 return await models.Product.findAll();
             }
         },
+        orders:{
+            type: GraphQLList(types.orderType),
+            description: "Returns all orders",
+            resolve: async (parent,data,context) => {
+                const user = {context};
+
+                const isAdmin = user.context.user.dataValues.isAdmin;
+
+                if(!user || !isAdmin){
+                    return null;
+                }
+
+                return await models.Order.findAll();
+            }
+        },
         currentUser: {
             type: types.userType,
             description: "Returns current user",

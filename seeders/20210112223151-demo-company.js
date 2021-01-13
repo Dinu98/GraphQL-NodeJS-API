@@ -17,11 +17,29 @@ module.exports = {
      updatedAt: new Date(),
   }));
 
+  const mockUsersProducts = new Array(10).fill().map(() => ({
+    UserId: (faker.random.number() % 10) + 1,
+    ProductId: (faker.random.number() % 10) + 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }));
+
+  const mockOrdersProducts = new Array(10).fill().map(() => ({
+    OrderId: (faker.random.number() % 10) + 1,
+    ProductId: (faker.random.number() % 10) + 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }));
+
     await queryInterface.bulkInsert('Companies', mockCompanies, {});
+    await queryInterface.bulkInsert('UsersProducts', mockUsersProducts, {});
+    await queryInterface.bulkInsert('OrdersProducts', mockOrdersProducts, {});
 },
 
   down: async (queryInterface, Sequelize) => {
 
     await queryInterface.bulkDelete('Companies', null, {});
+    await queryInterface.bulkDelete('UsersProducts', null, {});
+    await queryInterface.bulkInsert('OrdersProducts', null, {});
   }
 };

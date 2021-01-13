@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       models.Product.belongsToMany(models.User, { through: 'UsersProducts' });
       models.Product.belongsToMany(models.Order, {through: 'OrdersProducts' });
       models.Product.belongsTo(models.Company, {foreignKey: 'companyId'});
+      models.Product.hasMany(models.Review, {foreignKey: 'productId'});
     }
   };
   Product.init({
