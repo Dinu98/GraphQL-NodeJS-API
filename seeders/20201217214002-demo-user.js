@@ -13,9 +13,19 @@ module.exports = {
     email: faker.internet.email(),
     password: hashedPassword,
     profilePicture: faker.image.imageUrl(),
+    isAdmin: false,
     createdAt: new Date(),
     updatedAt: new Date(),
    }));
+
+   mockUsers.push({
+    username:faker.internet.userName(),
+    email: faker.internet.email(),
+    password: hashedPassword,
+    profilePicture: faker.image.imageUrl(),
+    isAdmin: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),});
 
    await queryInterface.bulkInsert('Users', mockUsers, {});  
   },
