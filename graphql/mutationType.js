@@ -102,10 +102,14 @@ const mutationType = new GraphQLObjectType({
             const {user} = context;
 
             if(!product || !user){
-              return null;
+              return false;
             }
 
-            await user.removeProduct(product);
+            const deleteStatus = await user.removeProduct(product);
+            
+            if(!deleteStatus){
+              return false;
+            }
 
             return true;
           }
@@ -136,6 +140,25 @@ const mutationType = new GraphQLObjectType({
             }
 
             return order;
+          }
+        },
+        cancelOrder:{
+          type: GraphQLBoolean,
+          description: "Cancels a specific order of the current user",
+          args:{
+            orderId: {type: GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async (parent, {orderId}, context) => {
+            const {user} = context;
+            const order = await models.Order.findByPk(orderId);
+
+            if(!user || !order || user.id !== order.userId){
+              return false;
+            }
+
+            await order.destroy();
+
+            return true;
           }
         },
         createReview:{
@@ -196,7 +219,7 @@ const mutationType = new GraphQLObjectType({
             const review = await models.Review.findByPk(id);
 
             if(!user || !review || user.id !== review.userId){
-              return null;
+              return false;
             }
 
             await review.destroy();
